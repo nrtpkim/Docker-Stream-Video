@@ -1,0 +1,29 @@
+version: '3.8'
+networks:
+  streaming:
+    driver: bridge
+
+services:
+  mock_rtsp_server:
+    image: aler9/rtsp-simple-server:latest
+    container_name: rtsp.$DOMAIN
+    environment:
+      TZ: Asia/Bangkok
+      RTSP_PROTOCOLS: tcp
+      RTSP_READBUFFERCOUNT: 1024
+      RTSP_READBUFFERSIZE: 4096
+    networks:
+      - streaming
+    ports:
+      - 8554:8554
+
+  mock_rtsp_client:
+    image: linuxserver/ffmpeg:amd64-latest
+    container_name: rtsp-client.$DOMAIN
+    command: -re -stream_loop -1 -i /data/source.mp4 -c copy -s 1280x720 -r 30 -vcodec libx265 -an -f rtsp rtsp://rtsp.$DOMAIN:8554/teststream
+    environment:
+      TZ: Asia/Bangkok
+    volumes:
+      - ./assets/videos/FR_MG_TEST.mp4:/data/source.mp4:ro
+    networks:
+      - streaming
