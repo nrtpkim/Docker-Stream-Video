@@ -27,3 +27,15 @@ services:
       - ./assets/videos/FR_MG_TEST.mp4:/data/source.mp4:ro
     networks:
       - streaming
+
+  mock_rtsp_client2:
+    image: linuxserver/ffmpeg:amd64-latest
+    container_name: rtsp-client2.$DOMAIN
+    command: -re -stream_loop -1 -i /data/source.mp4 -c copy -s 1280x720 -r 30 -vcodec libx265 -an -f rtsp rtsp://rtsp.$DOMAIN:8554/teststream2
+    environment:
+      TZ: Asia/Bangkok
+    volumes:
+      - ./assets/videos/car.mp4:/data/source.mp4:ro
+    networks:
+      - streaming
+    
